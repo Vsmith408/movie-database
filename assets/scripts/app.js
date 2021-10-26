@@ -7,7 +7,28 @@ const userInputs = addMovieModal.querySelectorAll("input");
 const entryTextSection = document.getElementById("entry-text");
 const movies = [];
 
-const renderNewMovieEl = (title, imageUrl, rating) => {
+const updateUI = () => {
+  if (movies.length === 0) {
+    entryTextSection.style.display = "block";
+  } else {
+    entryTextSection.style.display = "none";
+  }
+};
+
+const deleteMovieHandler = (movieId) => {
+  let movieIndex = 0;
+  for (const movie of movies) {
+    if (movie.id === movieId) {
+      break;
+    }
+    movieIndex++;
+  }
+  movies.splice(movieIndex, 1);
+  const listRoot = document.getElementById("movie-list");
+  listRoot.children[movieIndex].remove();
+};
+
+const renderNewMovieEl = (id, title, imageUrl, rating) => {
   const newMovieEl = document.createElement("li");
   newMovieEl.className = "movie-element";
   newMovieEl.innerHTML = `
@@ -19,16 +40,9 @@ const renderNewMovieEl = (title, imageUrl, rating) => {
         <p>${rating}/5 stars</p>
     </div>
   `;
+  newMovieEl.addEventListener("click", deleteMovieHandler.bind(null, id));
   const listRoot = document.getElementById("movie-list");
   listRoot.append(newMovieEl);
-};
-
-const updateUI = () => {
-  if (movies.length === 0) {
-    entryTextSection.style.display = "block";
-  } else {
-    entryTextSection.style.display = "none";
-  }
 };
 
 const toggleBackdrop = () => {
@@ -65,6 +79,7 @@ const addMovieHandler = () => {
     return;
   }
   const newMovie = {
+    id: Math.random().toString(),
     title: titleValue,
     image: imageUrlValue,
     rating: ratingValue,
@@ -73,7 +88,12 @@ const addMovieHandler = () => {
   console.log(movies);
   toggleMovieModal();
   clearMovieInputs();
-  renderNewMovieEl(newMovie.title, newMovie.image, newMovie.rating);
+  renderNewMovieEl(
+    newMovie.id,
+    newMovie.title,
+    newMovie.image,
+    newMovie.rating
+  );
   updateUI();
 };
 
