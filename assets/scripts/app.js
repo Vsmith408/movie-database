@@ -16,8 +16,11 @@ const updateUI = () => {
     entryTextSection.style.display = "none";
   }
 };
-
-const deleteMovie = (movieId) => {
+const closeMovieDeletionModal = () => {
+  toggleBackdrop();
+  deleteMovieModal.classList.remove("visible");
+};
+const deleteMovieHandler = (movieId) => {
   let movieIndex = 0;
   for (const movie of movies) {
     if (movie.id === movieId) {
@@ -28,15 +31,20 @@ const deleteMovie = (movieId) => {
   movies.splice(movieIndex, 1);
   const listRoot = document.getElementById("movie-list");
   listRoot.children[movieIndex].remove();
+  closeMovieDeletionModal();
 };
-const closeMovieDeletionModal = () => {
-  toggleBackdrop();
-  deleteMovieModal.classList.remove("visible");
-};
-const deleteMovieHandler = (movieId) => {
+
+const startDeleteMovieHandler = (movieId) => {
   deleteMovieModal.classList.add("visible");
   toggleBackdrop();
-  //   deleteMovie(movieId)
+  const cancelDeletionBtn = deleteMovieModal.querySelector(".btn__passive");
+  const confirmDeletionBtn = deleteMovieModal.querySelector(".btn__danger");
+
+  cancelDeletionBtn.addEventListener("click", closeMovieDeletionModal);
+  confirmDeletionBtn.addEventListener(
+    "click",
+    startDeleteMovieHandler.bind(null, movieId)
+  );
 };
 
 const renderNewMovieEl = (id, title, imageUrl, rating) => {
@@ -51,7 +59,7 @@ const renderNewMovieEl = (id, title, imageUrl, rating) => {
         <p>${rating}/5 stars</p>
     </div>
   `;
-  newMovieEl.addEventListener("click", deleteMovieHandler.bind(null, id));
+  newMovieEl.addEventListener("click", startDeleteMovieHandler.bind(null, id));
   const listRoot = document.getElementById("movie-list");
   listRoot.append(newMovieEl);
 };
@@ -76,6 +84,7 @@ const clearMovieInputs = () => {
 };
 const cancelAddMovieHandler = () => {
   closeMovieModal();
+  toggleBackdrop();
   clearMovieInputs();
 };
 
@@ -117,6 +126,7 @@ const addMovieHandler = () => {
 const backdropClickHandler = () => {
   closeMovieModal();
   closeMovieDeletionModal();
+  clearMovieInputs();
 };
 
 startMovieBtn.addEventListener("click", showMovieModal);
